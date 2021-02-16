@@ -67,7 +67,37 @@ impl Logger {
     }
 }
 
+struct Printer;
+
+impl core::fmt::Write for Printer {
+    fn write_str(&mut self, s: &str) -> core::fmt::Result {
+        LOGGER.print_colored(s, [255, 255, 255]);
+        Ok(())
+    }
+}
+
 pub fn init() -> Result<(), SetLoggerError> {
     log::set_logger(&LOGGER)
         .map(|()| log::set_max_level(LevelFilter::max()))
+}
+
+pub fn _print(args: core::fmt::Arguments) {
+    use core::fmt::Write;
+    // use x86_64::instructions::interrupts;
+
+    // interrupts::without_interrupts(|| {
+    let mut printer = Printer;
+    printer.write_fmt(args).unwrap();
+    // });
+}
+
+#[macro_export]
+macro_rules! print {
+    ($($arg:tt)*) => ($crate::framebuffer::logger::_print(format_args!($($arg)*)));
+}
+
+#[macro_export]
+macro_rules! println {
+    () => ($crate::print!("\n"));
+    ($($arg:tt)*) => ($crate::print!("{}\n", format_args!($($arg)*)));
 }

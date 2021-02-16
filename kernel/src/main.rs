@@ -16,6 +16,8 @@ use bootloader::{entry_point, BootInfo};
 pub mod framebuffer;
 use framebuffer::FRAMEBUFFER;
 
+#[macro_use] use framebuffer::logger;
+
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     //QEMU debug output
@@ -42,7 +44,7 @@ fn panic(info: &PanicInfo) -> ! {
     }
 
     //On-screen output
-    //TODO :)
+    println!("Panic: {}", info);
 
     loop {}
 }
@@ -58,15 +60,17 @@ fn kernel_main(boot_info: &'static mut BootInfo) -> ! {
 
     FRAMEBUFFER.lock().clear(80, 13, 144);
 
-    framebuffer::logger::init();
+    logger::init();
 
     debug!("Hello world!");
 
     debug!("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 
-    for i in 0..100 {
-        error!("FUCK");
-    }
+    // for i in 0..100 {
+    //     error!("FUCK");
+    // }
+
+    panic!("FUCK");
 
     // for x in 0..10 {
     //     for y in 0..10 {
