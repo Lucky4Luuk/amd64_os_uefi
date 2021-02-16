@@ -24,8 +24,12 @@ fn kernel_main(boot_info: &'static mut BootInfo) -> ! {
         panic!("Framebuffer not found!"); //TODO: This really cannot panic, because there's no way to output to the screen
     };
 
-    // FRAMEBUFFER.lock().set_pixel(0,0);
-    FRAMEBUFFER.lock().clear();
+    for x in 0..10 {
+        for y in 0..10 {
+            FRAMEBUFFER.lock().set_pixel(x,y, 255, 0, 0); //x,y, r, g , b
+        }
+    }
+    // FRAMEBUFFER.lock().clear();
 
     loop {}
 }
