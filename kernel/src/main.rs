@@ -19,6 +19,7 @@ use framebuffer::FRAMEBUFFER;
 use framebuffer::logger;
 
 pub mod interrupts;
+pub mod gdt;
 
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
@@ -64,6 +65,8 @@ fn kernel_main(boot_info: &'static mut BootInfo) -> ! {
     logger::init().expect("Failed to initialize logger!");
     debug!("Hello world!");
 
+    gdt::init();
+    trace!("GDT enabled!");
     interrupts::init_idt();
     trace!("IDT enabled!");
 
