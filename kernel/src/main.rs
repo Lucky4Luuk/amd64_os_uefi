@@ -66,10 +66,7 @@ fn kernel_main(boot_info: &'static mut BootInfo) -> ! {
     debug!("Hello world!");
 
     gdt::init();
-    trace!("GDT enabled!");
     interrupts::init_idt();
-    trace!("IDT enabled!");
-
     // println!("Breakpoint handler: {:?}", interrupts::IDT);
 
     x86_64::instructions::interrupts::int3();

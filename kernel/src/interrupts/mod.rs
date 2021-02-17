@@ -15,6 +15,7 @@ lazy_static! {
 
 pub fn init_idt() {
     IDT.load();
+    trace!("IDT enabled!");
 }
 
 extern "x86-interrupt" fn breakpoint_handler(stack_frame: &mut InterruptStackFrame) {

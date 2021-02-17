@@ -63,4 +63,5 @@ pub fn init() {
         set_cs(GDT.1.code_selector);
         load_tss(GDT.1.tss_selector);
     }
+    trace!("GDT enabled!");
 }
