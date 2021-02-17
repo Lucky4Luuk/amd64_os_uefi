@@ -4,8 +4,9 @@
 #![feature(const_mut_refs)]
 #![feature(fmt_as_str)]
 #![feature(panic_info_message)]
-
 #![feature(assoc_char_funcs)]
+
+#![feature(abi_x86_interrupt)]
 
 #[macro_use] extern crate log;
 
@@ -13,10 +14,11 @@ use core::panic::PanicInfo;
 
 use bootloader::{entry_point, BootInfo};
 
-pub mod framebuffer;
+#[macro_use] pub mod framebuffer;
 use framebuffer::FRAMEBUFFER;
+use framebuffer::logger;
 
-#[macro_use] use framebuffer::logger;
+pub mod interrupts;
 
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
@@ -55,28 +57,20 @@ fn kernel_main(boot_info: &'static mut BootInfo) -> ! {
     *FRAMEBUFFER.lock() = if let Some(mut_fb) = boot_info.framebuffer.as_mut() {
         framebuffer::Framebuffer::with_buf(mut_fb)
     } else {
-        panic!("Framebuffer not found!"); //TODO: This really cannot panic, because there's no way to output to the screen
+        panic!("Framebuffer not found!");
     };
 
     FRAMEBUFFER.lock().clear(80, 13, 144);
-
-    logger::init();
-
+    logger::init().expect("Failed to initialize logger!");
     debug!("Hello world!");
 
-    debug!("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+    interrupts::init_idt();
+    trace!("IDT enabled!");
 
-    // for i in 0..100 {
-    //     error!("FUCK");
-    // }
+    // println!("Breakpoint handler: {:?}", interrupts::IDT);
 
-    panic!("FUCK");
-
-    // for x in 0..10 {
-    //     for y in 0..10 {
-    //         FRAMEBUFFER.lock().set_pixel(x,y, 255, 0, 0); //x,y, r, g , b
-    //     }
-    // }
+    x86_64::instructions::interrupts::int3();
+    println!("It didn't crash!");
 
     loop {}
 }

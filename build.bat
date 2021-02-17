@@ -16,7 +16,7 @@ cargo run --package boot
 IF ERRORLEVEL 1 GOTO ERROR
 popd
 echo Starting QEMU [bios]...
-qemu-system-x86_64 -drive format=raw,file=target/x86_64-amd64_os_uefi/debug/bootimage-bios-kernel.img -debugcon stdio
+qemu-system-x86_64 -drive format=raw,file=target/x86_64-amd64_os_uefi/debug/bootimage-bios-kernel.img -debugcon stdio -d int -no-reboot -no-shutdown
 exit
 
 :ERROR

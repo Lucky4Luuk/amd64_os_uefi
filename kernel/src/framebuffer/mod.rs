@@ -1,7 +1,7 @@
 use lazy_static::lazy_static;
 use spin::Mutex;
 
-pub mod logger;
+#[macro_use] pub mod logger;
 
 pub struct Framebuffer<'a> {
     raw_buf: Option<&'a mut bootloader::boot_info::FrameBuffer>,
