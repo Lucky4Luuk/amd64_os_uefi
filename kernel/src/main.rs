@@ -14,12 +14,15 @@ use core::panic::PanicInfo;
 
 use bootloader::{entry_point, BootInfo};
 
+use x86_64::VirtAddr;
+
 #[macro_use] pub mod framebuffer;
 use framebuffer::FRAMEBUFFER;
 use framebuffer::logger;
 
 pub mod interrupts;
 pub mod gdt;
+pub mod memory;
 
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
@@ -69,7 +72,13 @@ fn kernel_main(boot_info: &'static mut BootInfo) -> ! {
     interrupts::init_idt();
     // println!("Breakpoint handler: {:?}", interrupts::IDT);
 
-    x86_64::instructions::interrupts::int3();
+    let phys_mem_offset = VirtAddr::new(boot_info.physical_memory_offset.into_option().expect("Failed to locate physical memory offset!"));
+    let memory_mapper = unsafe { memory::init(phys_mem_offset) };
+
+    // x86_64::instructions::interrupts::int3();
+    let ptr = 0xdeadbeaf as *mut u32;
+    unsafe { *ptr = 42; }
+
     println!("It didn't crash!");
 
     loop {}
