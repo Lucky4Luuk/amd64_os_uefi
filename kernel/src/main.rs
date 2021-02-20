@@ -14,7 +14,10 @@ use core::panic::PanicInfo;
 
 use bootloader::{entry_point, BootInfo};
 
-use x86_64::VirtAddr;
+use x86_64::{
+    VirtAddr,
+    structures::paging::Page,
+};
 
 #[macro_use] pub mod framebuffer;
 use framebuffer::FRAMEBUFFER;
@@ -70,10 +73,15 @@ fn kernel_main(boot_info: &'static mut BootInfo) -> ! {
 
     gdt::init();
     interrupts::init_idt();
-    // println!("Breakpoint handler: {:?}", interrupts::IDT);
 
     let phys_mem_offset = VirtAddr::new(boot_info.physical_memory_offset.into_option().expect("Failed to locate physical memory offset!"));
-    let memory_mapper = unsafe { memory::init(phys_mem_offset) };
+    let mut memory_mapper = unsafe { memory::init(phys_mem_offset) };
+    let mut frame_allocator = unsafe { memory::BootInfoFrameAllocator::init(&boot_info.memory_regions) };
+
+    let page = Page::containing_address(VirtAddr::new(0xdeadbeaf000));
+    unsafe {
+        memory::map_page(page, &mut memory_mapper, &mut frame_allocator);
+    }
 
     // x86_64::instructions::interrupts::int3();
     let ptr = 0xdeadbeaf as *mut u32;

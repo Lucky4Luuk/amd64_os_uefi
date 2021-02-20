@@ -1,5 +1,5 @@
 use x86_64::{VirtAddr, PhysAddr};
-use x86_64::structures::paging::{PageTable, OffsetPageTable};
+use x86_64::structures::paging::{Page, PageTable, OffsetPageTable};
 
 /// Returns a mutable reference to the active level 4 table.
 ///
@@ -80,4 +80,8 @@ unsafe impl FrameAllocator<Size4KiB> for BootInfoFrameAllocator {
         self.next += 1;
         frame
     }
+}
+
+pub unsafe fn map_page(page: Page, mapper: &mut OffsetPageTable, frame_allocator: &mut impl FrameAllocator<Size4KiB>) {
+    
 }
