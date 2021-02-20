@@ -54,7 +54,7 @@ impl BootInfoFrameAllocator {
     }
 }
 
-use bootloader::memory_region::{MemoryRegion, MemoryRegionKind};
+use bootloader::memory_region::MemoryRegionKind;
 use x86_64::structures::paging::{FrameAllocator, Size4KiB, PhysFrame};
 
 impl BootInfoFrameAllocator {
@@ -82,6 +82,21 @@ unsafe impl FrameAllocator<Size4KiB> for BootInfoFrameAllocator {
     }
 }
 
-pub unsafe fn map_page(page: Page, mapper: &mut OffsetPageTable, frame_allocator: &mut impl FrameAllocator<Size4KiB>) {
-    
+use x86_64::structures::paging::mapper::MapToError;
+use x86_64::structures::paging::Mapper;
+
+/// Maps a page to a physical frame. Currently marked as unsafe, because I'm unsure of its safety.
+/// It shouldn't remap in-use frames, but if it happens, please let me know in a Github issue.
+pub unsafe fn map_page(page: Page, mapper: &mut OffsetPageTable, frame_allocator: &mut impl FrameAllocator<Size4KiB>) -> Result<(), MapToError<Size4KiB>> {
+    use x86_64::structures::paging::PageTableFlags as Flags;
+
+    let frame = match frame_allocator.allocate_frame() {
+        Some(frame) => frame,
+        None => return Err(MapToError::FrameAllocationFailed),
+    };
+    let flags = Flags::PRESENT | Flags::WRITABLE;
+
+    mapper.map_to(page, frame, flags, frame_allocator)?.flush();
+
+    Ok(())
 }

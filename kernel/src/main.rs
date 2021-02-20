@@ -37,14 +37,7 @@ fn panic(info: &PanicInfo) -> ! {
                 cpuio::outb(c as u8, 0xe9);
             }
         }
-        // let mut line = info.location().unwrap().line();
-        // for i in 0..4 {
-        //     //num / (base ^ digit) % base
-        //     let num = line / 10u32.pow(i) % 10;
-        //     unsafe {
-        //         cpuio::outb(num as u8, 0xe9);
-        //     }
-        // }
+
         for c in info.message().unwrap().as_str().unwrap_or("no panic message provided").chars() {
             unsafe {
                 cpuio::outb(c as u8, 0xe9);
@@ -67,6 +60,8 @@ fn kernel_main(boot_info: &'static mut BootInfo) -> ! {
         panic!("Framebuffer not found!");
     };
 
+    loop {}
+
     FRAMEBUFFER.lock().clear(80, 13, 144);
     logger::init().expect("Failed to initialize logger!");
     debug!("Hello world!");
@@ -74,14 +69,18 @@ fn kernel_main(boot_info: &'static mut BootInfo) -> ! {
     gdt::init();
     interrupts::init_idt();
 
+    println!("Mem offset boot_info: {:?}", boot_info.physical_memory_offset);
     let phys_mem_offset = VirtAddr::new(boot_info.physical_memory_offset.into_option().expect("Failed to locate physical memory offset!"));
+    println!("Mem offset selected: {:?}", phys_mem_offset);
+
     let mut memory_mapper = unsafe { memory::init(phys_mem_offset) };
     let mut frame_allocator = unsafe { memory::BootInfoFrameAllocator::init(&boot_info.memory_regions) };
 
     let page = Page::containing_address(VirtAddr::new(0xdeadbeaf000));
     unsafe {
-        memory::map_page(page, &mut memory_mapper, &mut frame_allocator);
+        memory::map_page(page, &mut memory_mapper, &mut frame_allocator).expect("Failed to map page!");
     }
+    trace!("Page mapped!");
 
     // x86_64::instructions::interrupts::int3();
     let ptr = 0xdeadbeaf as *mut u32;
