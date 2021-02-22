@@ -5,7 +5,7 @@ authors = ["Luuk van Oijen <lazyluuk.channel@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-bootloader = { version = "0.10.0-alpha-02", features = ["map_physical_memory"] }
+bootloader = { version = "0.10.0-alpha-03", features = ["map_physical_memory"] }
 spin = "0.7.1"
 
 log = "*"
@@ -28,3 +28,4 @@ features = ["unicode"]
 [package.metadata.bootloader]
 map-physical-memory = true
 physical-memory-offset = "0xFFFF800000000000"
+invalid-key = 5
