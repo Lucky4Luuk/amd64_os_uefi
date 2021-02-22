@@ -27,5 +27,4 @@ features = ["unicode"]
 
 [package.metadata.bootloader]
 map-physical-memory = true
-physical-memory-offset = "0xFFFF800000000000"
-invalid-key = 5
+# physical-memory-offset = "0xFFFF800000000000"

@@ -8,7 +8,3 @@ edition = "2018"
 
 [dependencies]
 bootloader-locator = "0.0.4"
-
-[package.metadata.bootloader]
-map-physical-memory = true
-invalid-key = 5

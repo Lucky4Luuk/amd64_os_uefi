@@ -60,8 +60,6 @@ fn kernel_main(boot_info: &'static mut BootInfo) -> ! {
         panic!("Framebuffer not found!");
     };
 
-    loop {}
-
     FRAMEBUFFER.lock().clear(80, 13, 144);
     logger::init().expect("Failed to initialize logger!");
     debug!("Hello world!");
@@ -76,7 +74,7 @@ fn kernel_main(boot_info: &'static mut BootInfo) -> ! {
     let mut memory_mapper = unsafe { memory::init(phys_mem_offset) };
     let mut frame_allocator = unsafe { memory::BootInfoFrameAllocator::init(&boot_info.memory_regions) };
 
-    let page = Page::containing_address(VirtAddr::new(0xdeadbeaf000));
+    let page = Page::containing_address(VirtAddr::new(0xdeadbeaf));
     unsafe {
         memory::map_page(page, &mut memory_mapper, &mut frame_allocator).expect("Failed to map page!");
     }

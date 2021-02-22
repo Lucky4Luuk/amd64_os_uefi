@@ -11,8 +11,8 @@ pub fn main() {
     let kernel_binary = Path::new("../target/x86_64-amd64_os_uefi/debug/kernel").canonicalize().unwrap();
     // Path to the root of this crate, set by cargo
     let manifest_dir = Path::new(env!("CARGO_MANIFEST_DIR"));
-    // We know that the kernel lives in the parent directory
-    let kernel_dir = manifest_dir.parent().unwrap();
+    // We know that the kernel lives in the parent's kernel directory
+    let kernel_dir = manifest_dir.parent().unwrap().join("kernel");
 
     let kernel_manifest = kernel_dir.join("Cargo.toml");
     // Use the same target folder for building the bootloader
